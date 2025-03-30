@@ -1,0 +1,36 @@
+[build]
+  command = "npm install --legacy-peer-deps && npm run build"
+  publish = "build"
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  conditions = { "Path" = [ "!/api/*", "!/.netlify/functions/*" ] }
+
+[[headers]]
+  for = "/*.pdf"
+  [headers.values]
+    X-Robots-Tag = "none"
+    Cache-Control = "no-store"
+
+[[headers]]
+  for = "/.netlify/functions/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'none'"
+    X-Frame-Options = "DENY"
+
+[dev]
+  command = "npm run dev"  # Runs Vite
+  targetPort = 5173        # Explicitly set Vite's port
+  port = 8888              # Netlify Dev's frontend port
+  functionsPort = 9999     # Avoid conflict with 8888
+  functions = "netlify/functions"
+  publish = "build"
+  framework = "create-react-app"
